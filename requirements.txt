@@ -1,0 +1,24 @@
+# PDF extraction & reconstruction
+pymupdf>=1.24.0
+numpy>=1.26.0; python_version < "3.13"
+
+# OCR for text embedded in images (phase 1+; requires Python 3.9–3.12)
+# On Python 3.14 use a separate venv-ocr — see scripts/setup_ocr_venv.sh
+paddlepaddle>=3.0.0; python_version < "3.13"
+paddleocr>=2.7.0; python_version < "3.13"
+
+# Unofficial Google Translate (same endpoint as translate.google.com)
+# googletrans is broken on Python 3.13+; use deep-translator instead
+deep-translator>=1.11.0
+
+# Background color sampling (phase 5+)
+Pillow>=10.0.0
+
+# Async file I/O (phase 6+)
+aiofiles>=24.0.0
+
+# HTML QA preview (optional, phase 6+)
+Jinja2>=3.1.0
+
+# Strategy 2 only — direct stream edit (optional, not used in overlay path)
+# pikepdf>=9.0.0

@@ -1,0 +1,1 @@
+"""PDF brochure translation pipeline."""
