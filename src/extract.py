@@ -1,7 +1,7 @@
 """
 Phase 1: extract layout.json + text.en.json for PDF page(s).
 
-Combines PyMuPDF text-layer spans with PaddleOCR for text embedded in images.
+    Combines PyMuPDF text-layer spans with Tesseract OCR for text embedded in images.
 
 Usage:
     python -m src.extract "input/brochure.pdf" --page 4 --out pages/page_4
@@ -16,7 +16,7 @@ from pathlib import Path
 
 import pymupdf as fitz
 
-from src.spans import extract_page_spans, write_page_bundle
+from src.spans import OcrBackend, extract_page_spans, write_page_bundle
 
 
 def extract_one_page(
@@ -26,6 +26,7 @@ def extract_one_page(
     *,
     lang: str,
     use_ocr: bool,
+    ocr_backend: OcrBackend,
     ocr_zoom: float,
     ocr_lang: str,
     min_ocr_confidence: float,
@@ -34,6 +35,7 @@ def extract_one_page(
     spans, images = extract_page_spans(
         page,
         use_ocr=use_ocr,
+        ocr_backend=ocr_backend,
         ocr_zoom=ocr_zoom,
         ocr_lang=ocr_lang,
         min_ocr_confidence=min_ocr_confidence,
@@ -67,7 +69,13 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument(
         "--no-ocr",
         action="store_true",
-        help="Skip PaddleOCR (PDF text layer only)",
+        help="Skip OCR (PDF text layer only)",
+    )
+    parser.add_argument(
+        "--ocr-backend",
+        default="auto",
+        choices=["auto", "tesseract", "paddle"],
+        help="OCR backend: auto, tesseract, or paddle (default: auto)",
     )
     parser.add_argument(
         "--ocr-zoom",
@@ -78,7 +86,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument(
         "--ocr-lang",
         default="en",
-        help="PaddleOCR language code (default: en)",
+        help="OCR language code (default: en)",
     )
     parser.add_argument(
         "--min-ocr-confidence",
@@ -116,6 +124,7 @@ def main(argv: list[str] | None = None) -> int:
                 out_dir,
                 lang=args.lang,
                 use_ocr=not args.no_ocr,
+                ocr_backend=args.ocr_backend,
                 ocr_zoom=args.ocr_zoom,
                 ocr_lang=args.ocr_lang,
                 min_ocr_confidence=args.min_ocr_confidence,

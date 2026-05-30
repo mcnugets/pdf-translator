@@ -15,7 +15,7 @@ from dataclasses import asdict
 
 import pymupdf as fitz
 
-from src.spans import SpanRecord, extract_page_spans
+from src.spans import OcrBackend, SpanRecord, extract_page_spans
 
 
 def _color_hex(color: int) -> str:
@@ -44,6 +44,7 @@ def inspect_page(
     page_num: int,
     *,
     use_ocr: bool = False,
+    ocr_backend: OcrBackend = "auto",
     ocr_zoom: float = 2.0,
     ocr_lang: str = "en",
 ) -> list[SpanRecord]:
@@ -57,6 +58,7 @@ def inspect_page(
     spans, _ = extract_page_spans(
         page,
         use_ocr=use_ocr,
+        ocr_backend=ocr_backend,
         ocr_zoom=ocr_zoom,
         ocr_lang=ocr_lang,
     )
@@ -88,7 +90,13 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("pdf", help="Path to input PDF")
     parser.add_argument("-p", "--page", type=int, default=0, help="Page index, 0-based")
     parser.add_argument("--json", action="store_true", help="Also print spans as JSON")
-    parser.add_argument("--ocr", action="store_true", help="Include PaddleOCR spans")
+    parser.add_argument("--ocr", action="store_true", help="Include OCR spans")
+    parser.add_argument(
+        "--ocr-backend",
+        default="auto",
+        choices=["auto", "tesseract", "paddle"],
+        help="OCR backend (default: auto)",
+    )
     parser.add_argument("--ocr-zoom", type=float, default=2.0)
     parser.add_argument("--ocr-lang", default="en")
     args = parser.parse_args(argv)
@@ -104,6 +112,7 @@ def main(argv: list[str] | None = None) -> int:
             doc,
             args.page,
             use_ocr=args.ocr,
+            ocr_backend=args.ocr_backend,
             ocr_zoom=args.ocr_zoom,
             ocr_lang=args.ocr_lang,
         )
