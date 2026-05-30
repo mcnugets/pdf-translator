@@ -463,9 +463,8 @@ def _insert_text_only(
             continue
         prev = current[-1]
         gap = s["bbox"][1] - prev["bbox"][3]
-        threshold = float(prev.get("size", 10)) * 1.5
         same_size = abs(float(s.get("size", 10)) - float(prev.get("size", 10))) < 0.5
-        if same_size and gap < threshold and s["bbox"][0] < prev["bbox"][2]:
+        if same_size and -1 < gap < 4 and s["bbox"][0] < prev["bbox"][2] + 1 and s["bbox"][2] > prev["bbox"][0] - 1:
             current.append(s)
         else:
             paragraphs.append(current)
